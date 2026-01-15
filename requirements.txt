@@ -1,0 +1,14 @@
+ultralytics
+torch
+torchvision
+torchaudio
+opencv-python
+numpy
+pandas
+matplotlib
+scikit-learn
+jupyterlab
+ffmpeg-python
+supervision
+boto3
+dotenv

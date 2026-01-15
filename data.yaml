@@ -1,0 +1,8 @@
+train: C:/your-dataset/train
+val: C:your-dataset//val
+test: C:your-dataset/test  # Optional
+
+nc: 2  # Number of classes
+names:
+  - person
+  - gun
