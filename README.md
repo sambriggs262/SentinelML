@@ -10,9 +10,9 @@ A modular, open-source framework for real-time firearm detection and alerting us
 
 ## Overview
 
-SentinelML is a research-oriented system designed to evaluate the effectiveness of an AI-driven, real-time, direct-to-first-responder firearm detection system developed using open-source models and cloud-native infrastructure. This project seeks to explore whether recent advances in open-source computer vision and cloud tooling can enable a lower-cost, practical firearm detection framework compared to commercial solutions such as ZeroEyes and Actuate.
+SentinelML is a research-oriented system designed to evaluate the effectiveness of an AI-driven, real-time, direct-to-operator firearm detection system developed using open-source models and cloud-native infrastructure. This project seeks to explore whether recent advances in open-source computer vision and cloud tooling can enable a lower-cost, practical firearm detection framework for research and educational purposes.
 
-The framework prioritizes three distinct criteria: speed, reliability, and removal of the human bottleneck. By leveraging YOLOv8 for detection, FastAPI for inference, and AWS services for alert delivery, SentinelML achieves a mean latency from detection to alert of 301 milliseconds, demonstrating response capabilities suitable for real-time security monitoring.
+The framework prioritizes three distinct criteria: speed, reliability, and reduction of third-party human monitoring latency. By leveraging YOLOv8 for detection, FastAPI for inference, and AWS services for alert delivery, SentinelML achieved a mean latency from detection to alert of 301 milliseconds under experimental conditions, demonstrating response capabilities suitable for real-time security monitoring.
 
 **Key Features:**
 - YOLOv8-based firearm detection with configurable confidence thresholds
@@ -20,7 +20,7 @@ The framework prioritizes three distinct criteria: speed, reliability, and remov
 - Direct alert delivery via WebSocket with presigned S3 URLs for video clips
 - Dataset merging and preprocessing utilities
 - Experiment tracking integration (Comet ML)
-- Complete data privacy through local or VPC-isolated infrastructure
+- Data privacy through local inference and VPC-isolated infrastructure
 
 ---
 
@@ -75,13 +75,9 @@ The complete custom dataset is not publicly released due to privacy and safety c
     │   Frontend  │          │ AWS Lambda   │          │  AWS S3    │
     │  Dashboard  │          │  (Detection) │          │  (Clips)   │
     │  (localhost:│          │              │          │            │
-    │   3000)     │          └───────┬──────┘          └────────────┘
-    └─────────────┘                  │
-                                     │
-                          ┌──────────▼─────────┐
-                          │   AWS SNS Topic    │
-                          │  (Alert Dispatch)  │
-                          └────────────────────┘
+    │   3000)     │          └──────────────┘          └────────────┘
+    └─────────────┘                  
+                         
 ```
 
 **System Flow:**
@@ -94,7 +90,6 @@ The complete custom dataset is not publicly released due to privacy and safety c
    - Invokes AWS Lambda with detection metadata
 
 3. **AWS Alert Pipeline**: Lambda receives the detection event and:
-   - Publishes an alert message to an AWS SNS topic containing the S3 presigned URL, confidence score, and timestamp
    - Forwards the alert via WebSocket to connected dashboard clients
 
 4. **Frontend Dashboard**: React.js-based web interface displays:
@@ -243,13 +238,13 @@ PRESIGN_EXPIRES = 86400              # S3 presigned URL validity (seconds)
 ### Prerequisites
 - AWS account with appropriate IAM permissions
 - S3 bucket for video storage
-- API Gateway WebSocket endpoint (or SNS topic for alerts)
+- API Gateway WebSocket endpoint
 
 ### Manual Setup
 
 1. **S3 Bucket**
    ```bash
-   aws s3 mb s3://sentinel-ml-clips --region us-east-1
+    aws s3 mb s3://<your-bucket-name> --region us-east-1
    ```
 
 2. **IAM Role**
@@ -261,7 +256,8 @@ PRESIGN_EXPIRES = 86400              # S3 presigned URL validity (seconds)
 4. **Environment Configuration**
    ```bash
    export AWS_REGION=us-east-1
-   export S3_BUCKET=sentinel-ml-clips
+   export S3_BUCKET=<your-bucket-name>
+
    export WS_ENDPOINT=wss://your-api-id.execute-api.us-east-1.amazonaws.com/prod
    ```
 
@@ -339,7 +335,7 @@ The mAP@50 metric demonstrates effective detection at moderate overlap threshold
 
 ### System Latency
 
-Mean end-to-end latency (detection to alert display): **301 milliseconds**
+Mean end-to-end latency under experimental conditions (detection to alert display): **301 milliseconds**
 
 This includes:
 - YOLO inference: ~35-50 ms
@@ -399,7 +395,7 @@ Tests video encoding and upload pipeline.
 
 ```json
 {
-  "url": "https://s3.amazonaws.com/sentinel-ml-clips/clips/1704067200.mp4",
+"url": "https://s3.amazonaws.com/<your-bucket-name>/clips/1704067200.mp4"
   "ffmpeg": "/usr/bin/ffmpeg"
 }
 ```
